@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.sql.*;
 
 /*
@@ -12,12 +13,15 @@ import java.sql.*;
  */
 public class Main extends javax.swing.JFrame {
 
+    public int selectedRow = 0;
     /**
      * Creates new form Main
      */
     public Main() {
         SQLConnect();
         initComponents();
+        truncateUsersTable(); // deletes all the data in the users table
+        showTableData(); // shows the data in the users table
         this.setLocationRelativeTo(null);
         this.setResizable(false);
     }
@@ -30,10 +34,23 @@ public class Main extends javax.swing.JFrame {
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
             System.out.println("Connected to database");
             con.close();
-        }  catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
         }
         return conn;
+    }
+
+    public static void truncateUsersTable() {
+        try {
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
+            String query = "TRUNCATE TABLE users";
+            PreparedStatement pst = con.prepareStatement(query);
+            pst.executeUpdate();
+            System.out.println("Table cleared");
+            con.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -91,13 +108,25 @@ public class Main extends javax.swing.JFrame {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.String.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
         jTable1.getTableHeader().setResizingAllowed(false);
         jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(0).setResizable(false);
@@ -109,6 +138,11 @@ public class Main extends javax.swing.JFrame {
 
         jButton3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton3.setText("Delete");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -192,9 +226,9 @@ public class Main extends javax.swing.JFrame {
             pst.setString(1, name);
             pst.setString(2, mobile);
             pst.executeUpdate();
+            showTableData();
             JOptionPane.showMessageDialog(null, "Data Inserted Successfully");
             System.out.println("Data Inserted Successfully");
-            showTableData();
             jTextField1.setText("");
             jTextField2.setText("");
         } catch (Exception e) {
@@ -202,30 +236,62 @@ public class Main extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    public void showTableData() {
-      try {
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
-        String query = "SELECT * FROM `users`";
-        PreparedStatement pst = con.prepareStatement(query);
-        // loop through the result set
-        ResultSet rs = pst.executeQuery();
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        // TODO add your handling code here:
+        // get the selected row and save it to the global variable
+        selectedRow = jTable1.getSelectedRow();
 
-        while (rs.next()) {
-            String col1 = rs.getString("Name");
-            String col2 = rs.getString("Mobile_Number");
+    }//GEN-LAST:event_jTable1MouseClicked
 
-            String tbData[] = {col1, col2};
-            DefaultTableModel tblModel = (DefaultTableModel)jTable1.getModel();
-            tblModel.addRow(tbData);
-            jTable1.setModel(tblModel);
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        // delete the selected row from the table and from the MySQL database
+        // add a delete confirmation dialog
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this row?", "Warning", JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            // delete the row from the database
+            try {
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
+                String query = "DELETE FROM `users` WHERE id = ?";
+                PreparedStatement pst = con.prepareStatement(query);
+                pst.setString(1, jTable1.getValueAt(selectedRow, 0).toString());
+                pst.executeUpdate();
+                showTableData();
+                JOptionPane.showMessageDialog(null, "Data Deleted Successfully");
+                System.out.println("Data Deleted Successfully");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
         }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    public void showTableData() {
+        try {
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
+            String query = "SELECT * FROM `users`";
+            PreparedStatement pst = con.prepareStatement(query);
+            // loop through the result set
+            ResultSet rs = pst.executeQuery();
+
+            // empty the table before adding new data
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+            while (rs.next()) {
+                String col1 = rs.getString("Name");
+                String col2 = rs.getString("Mobile_Number");
+
+                String tbData[] = {col1, col2};
+                DefaultTableModel tblModel = (DefaultTableModel) jTable1.getModel();
+                tblModel.addRow(tbData);
+                jTable1.setModel(tblModel);
+            }
 
 
-
-      } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, e);
-      }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
     }
+
     /**
      * @param args the command line arguments
      */
