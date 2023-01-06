@@ -21,6 +21,7 @@ public class UpdateForm extends javax.swing.JFrame {
         UpdateNameField.setText(Main.jTable1.getValueAt(Main.jTable1.getSelectedRow(), 1).toString());
         UpdateMobileNoField.setText(Main.jTable1.getValueAt(Main.jTable1.getSelectedRow(), 2).toString());
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        this.setLocationRelativeTo(null);
     }
 
 
@@ -115,27 +116,30 @@ public class UpdateForm extends javax.swing.JFrame {
         // TODO add your handling code here:
 
         int selectedRow = Main.selectedRow;
+
         try {
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
             String updateName = UpdateNameField.getText();
             String updateMobile = UpdateMobileNoField.getText();
 
-
-
-            // create a query to update the data with the selected row
-            // use it with prepared statement
-            int id = Integer.parseInt(Main.jTable1.getModel().getValueAt(selectedRow, 0).toString());
-            String updateQuery = "UPDATE `users` SET `name`=?,`mobile_number`=? WHERE id = ?";
-            PreparedStatement pst = con.prepareStatement(updateQuery);
-            pst.setString(1, updateName);
-            pst.setString(2, updateMobile);
-            pst.setInt(3, id);
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Data Updated Successfully");
-            con.close();
-            this.dispose();
-            // refresh the table in the main window
-            Main.showTableData();
+            if (UpdateNameField.equals("") || UpdateMobileNoField.equals("")) {
+                JOptionPane.showMessageDialog(null, "Please fill all the fields");
+            } else {
+                // create a query to update the data with the selected row
+                // use it with prepared statement
+                int id = Integer.parseInt(Main.jTable1.getModel().getValueAt(selectedRow, 0).toString());
+                String updateQuery = "UPDATE `users` SET `name`=?,`mobile_number`=? WHERE id = ?";
+                PreparedStatement pst = con.prepareStatement(updateQuery);
+                pst.setString(1, updateName);
+                pst.setString(2, updateMobile);
+                pst.setInt(3, id);
+                pst.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Data Updated Successfully");
+                con.close();
+                this.dispose();
+                // refresh the table in the main window
+                Main.showTableData();
+            }
         } catch (SQLException e) {
             System.out.println(e);
         }

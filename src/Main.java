@@ -42,7 +42,7 @@ public class Main extends javax.swing.JFrame {
         return conn;
     }
 
-    public static void truncateUsersTable() {
+    public static void truncateUsersTable() { // this will delete everything in the users table
         try {
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
             String query = "TRUNCATE TABLE users";
@@ -252,9 +252,7 @@ public class Main extends javax.swing.JFrame {
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         // TODO add your handling code here:
         selectedRow = jTable1.getSelectedRow();
-        System.out.println(selectedRow);
-
-
+        System.out.println("Selected row: "+selectedRow);
         // get the selected row and save it to the global variable
     }//GEN-LAST:event_jTable1MouseClicked
 
@@ -286,7 +284,11 @@ public class Main extends javax.swing.JFrame {
 
     private void UpdateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateBtnActionPerformed
         // TODO add your handling code here:
-        new UpdateForm().setVisible(true);
+        try {
+            new UpdateForm().setVisible(true);
+        } catch (Exception e) {
+            System.out.println("Please select a row first");
+        }
         showTableData();
     }//GEN-LAST:event_UpdateBtnActionPerformed
 
