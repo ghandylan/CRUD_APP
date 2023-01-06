@@ -17,6 +17,9 @@ public class UpdateForm extends javax.swing.JFrame {
     //access the selectedRow from Main.java
     public UpdateForm() {
         initComponents();
+        // set textfield text to the selected row data
+        UpdateNameField.setText(Main.jTable1.getValueAt(Main.jTable1.getSelectedRow(), 1).toString());
+        UpdateMobileNoField.setText(Main.jTable1.getValueAt(Main.jTable1.getSelectedRow(), 2).toString());
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     }
 
@@ -117,6 +120,8 @@ public class UpdateForm extends javax.swing.JFrame {
             String updateName = UpdateNameField.getText();
             String updateMobile = UpdateMobileNoField.getText();
 
+
+
             // create a query to update the data with the selected row
             // use it with prepared statement
             int id = Integer.parseInt(Main.jTable1.getModel().getValueAt(selectedRow, 0).toString());
@@ -134,10 +139,6 @@ public class UpdateForm extends javax.swing.JFrame {
         } catch (SQLException e) {
             System.out.println(e);
         }
-
-
-        System.out.println("Selected row from main is: " + Main.selectedRow);
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
