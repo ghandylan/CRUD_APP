@@ -117,29 +117,33 @@ public class UpdateForm extends javax.swing.JFrame {
 
         int selectedRow = Main.selectedRow;
 
+        if (UpdateNameField.getText().equals("") || UpdateMobileNoField.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "Please fill all the fields");
+            return;
+        }
+
+
         try {
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
             String updateName = UpdateNameField.getText();
             String updateMobile = UpdateMobileNoField.getText();
 
-            if (UpdateNameField.equals("") || UpdateMobileNoField.equals("")) {
-                JOptionPane.showMessageDialog(null, "Please fill all the fields");
-            } else {
-                // create a query to update the data with the selected row
-                // use it with prepared statement
-                int id = Integer.parseInt(Main.jTable1.getModel().getValueAt(selectedRow, 0).toString());
-                String updateQuery = "UPDATE `users` SET `name`=?,`mobile_number`=? WHERE id = ?";
-                PreparedStatement pst = con.prepareStatement(updateQuery);
-                pst.setString(1, updateName);
-                pst.setString(2, updateMobile);
-                pst.setInt(3, id);
-                pst.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Data Updated Successfully");
-                con.close();
-                this.dispose();
-                // refresh the table in the main window
-                Main.showTableData();
-            }
+
+            // create a query to update the data with the selected row
+            // use it with prepared statement
+            int id = Integer.parseInt(Main.jTable1.getModel().getValueAt(selectedRow, 0).toString());
+            String updateQuery = "UPDATE `users` SET `name`=?,`mobile_number`=? WHERE id = ?";
+            PreparedStatement pst = con.prepareStatement(updateQuery);
+            pst.setString(1, updateName);
+            pst.setString(2, updateMobile);
+            pst.setInt(3, id);
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Data Updated Successfully");
+            con.close();
+            this.dispose();
+            // refresh the table in the main window
+            Main.showTableData();
+
         } catch (SQLException e) {
             System.out.println(e);
         }
