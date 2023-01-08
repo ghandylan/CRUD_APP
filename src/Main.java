@@ -92,12 +92,6 @@ public class Main extends javax.swing.JFrame {
         AddBtn.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         AddBtn.setText("Add");
         AddBtn.addActionListener(this::AddBtnActionPerformed);
-
-        jTable1.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() { // sets ID data to left (instead of right)
-            {
-                setHorizontalAlignment(SwingConstants.LEFT);
-            }
-        });
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
                         {null, null, null}
@@ -218,6 +212,11 @@ public class Main extends javax.swing.JFrame {
                                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
+        jTable1.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() { // sets ID data to left (instead of right)
+            {
+                setHorizontalAlignment(SwingConstants.LEFT);
+            }
+        });
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
