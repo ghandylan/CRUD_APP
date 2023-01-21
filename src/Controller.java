@@ -3,23 +3,15 @@ import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 
 public class Controller {
-
+    static DBConnection connection = DBConnection.getInstance();
+    static Connection con = connection.connection;
 
     public static void SQLConnect() {
-        try {
-            // CONNECT TO MYSQL
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
-            System.out.println("Connected to database");
-            con.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException(e);
-        }
+        DBConnection.getInstance();
     }
 
     public static void truncateTable() {
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
             String query = "TRUNCATE TABLE users";
             PreparedStatement pst = con.prepareStatement(query);
             pst.executeUpdate();
@@ -32,7 +24,6 @@ public class Controller {
 
     public static void showTable() {
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
             String query = "SELECT * FROM `users`";
             PreparedStatement pst = con.prepareStatement(query);
             // loop through the result set
@@ -64,7 +55,6 @@ public class Controller {
         } else {
             try {
                 // create a sql date object, so we can use it in our INSERT statement
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
                 String query = "INSERT INTO `users`(`name`, `mobile_number`) VALUES (?,?)";
                 PreparedStatement pst = con.prepareStatement(query);
                 pst.setString(1, name);
@@ -87,8 +77,6 @@ public class Controller {
             // delete the row from the database
             try {
                 // delete selected row from the database
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/CRUD_APP", "root", "");
-                // convert selected ID string to int
                 int id = Integer.parseInt(Main.jTable1.getModel().getValueAt(Main.selectedRow, 0).toString());
                 String query = "DELETE FROM `users` WHERE id = ?";
                 PreparedStatement pst = con.prepareStatement(query);
@@ -102,7 +90,6 @@ public class Controller {
                 JOptionPane.showMessageDialog(null, e);
             }
         }
-        System.out.println("Row deleted" + Main.selectedRow);
     }
 
     public static void updateUser() {
